@@ -2,7 +2,7 @@ const API_KEY = "c1e87df0-b623-11e8-b9c8-a39304ff9948";
 
 window.onload = () => {
   const url = `https://api.harvardartmuseums.org/gallery?apikey=${API_KEY}`;
-  
+
   const hash = window.location.hash.slice(1);
   if (hash) {
     showObjectsTable(hash);
@@ -56,13 +56,12 @@ function showObjects(url) {
   fetch(url)
   .then(response => response.json())
   .then(data => {
-    console.log(data);
     data.records.forEach(object => {
       const people = object.people !== undefined ? object.people.map(person => person.name).join(", ") : "None Listed";
       document.querySelector("#objects").innerHTML += `
         <tr>
           <td>
-            <a href="#" onclick="showObjectInfo('${object.objectnumber}')">
+            <a href="#" onclick="showObjectInfo('${object.id}')">
               ${object.title}
             </a>
           </td>
@@ -85,16 +84,14 @@ function handleSearch() {
   document.querySelector("#all-galleries").style.display = "none";
   document.querySelector("#object-details").style.display = "none";
   const url = `https://api.harvardartmuseums.org/object?apikey=${API_KEY}&title=${encodeURI(query)}&size=100`;
-  showObjects(url); 
+  showObjects(url);
 }
 
-function showObjectInfo(objectNumber) {
-  const url = `https://api.harvardartmuseums.org/object?apikey=${API_KEY}&objectnumber=${objectNumber}`;
+function showObjectInfo(id) {
+  const url = `https://api.harvardartmuseums.org/object/${id}?apikey=${API_KEY}`;
   fetch(url)
   .then(response => response.json())
-  .then(data => {
-    const object = data.records[0];
-    console.log(object);
+  .then(object => {
     document.querySelector("#object-details").style.display = "block";
     document.querySelector("#all-objects").style.display = "none";
     document.querySelector("#all-galleries").style.display = "none";
@@ -105,7 +102,7 @@ function showObjectInfo(objectNumber) {
         <li>Provenance: ${object.provenance || "None"}</li>
         <li>Accession Year: ${object.accessionyear}</li>
       </ul>
-      <img src="${object.primaryimageurl}"></img> 
+      <img src="${object.primaryimageurl}"></img>
     `;
   });
 }
